@@ -87,7 +87,8 @@ public:
 		else
 		{
 			std::list<RangeNode<K,V>**> listconcernedLowestNodesInLeftSubTree;
-			insert(p_head, lowerBound, upperBound, value, (RangeNode<K,V>**)nullptr, listconcernedLowestNodesInLeftSubTree);
+			insert(p_head, lowerBound, upperBound, value, (RangeNode<K,V>**)nullptr, \
+					listconcernedLowestNodesInLeftSubTree);
 		}
 	}
 
@@ -96,7 +97,8 @@ public:
 		if(p_head)
 		{
 			std::list<RangeNode<K,V>**> listconcernedLowestNodesInLeftSubTree;
-			p_head = deleteNode(p_head, lowerBound, (RangeNode<K,V>**)nullptr, listconcernedLowestNodesInLeftSubTree);
+			p_head = deleteNode(p_head, lowerBound, (RangeNode<K,V>**)nullptr, \
+								listconcernedLowestNodesInLeftSubTree);
 		}
 	}
 
@@ -106,13 +108,18 @@ public:
 			searchAll(p_head, searchKey, &searchResults);
 	}
 
-	void setMaxRange(K range)
+	bool setMaxRange(K range)
 	{
+		if(p_head)
+			return false;
+
 		_bUniformRange = true;
 		if(nullptr != _pmaxrange)
 			delete _pmaxrange;
 		_pmaxrange = (K*)nullptr;
-		_pmaxrange = new(range);
+		_pmaxrange = new K(range);
+
+		return true;
 	}
 
 	bool find(K searchKey)
@@ -121,6 +128,7 @@ public:
 			return search(p_head, searchKey);
 	}
 
+	//void delete
 private:
 
 	//Creates and return a new node and increases the size of the tree
@@ -142,8 +150,9 @@ private:
 		}
 	}
 
-	RangeNode<K,V>* insert(RangeNode<K,V>* node, K& lowerBound, K& upperBound, V& value, 
-							RangeNode<K,V>** concernedLowestNodeInRightSubTree, std::list<RangeNode<K,V>**>& listconcernedLowestNodesInLeftSubTree)
+	RangeNode<K,V>* insert(RangeNode<K,V>* node, K& lowerBound, K& upperBound, V& value, \
+							RangeNode<K,V>** concernedLowestNodeInRightSubTree, \
+							std::list<RangeNode<K,V>**>& listconcernedLowestNodesInLeftSubTree)
 	{
 		if(node == nullptr)
 		{
@@ -166,20 +175,28 @@ private:
 
 		if(lowerBound < *node->m_pLowerBound )
 		{
-			//Check to see if the current node has the max node in its left subtree
-			if(node->p_LowestNodeinLeftSubTree == nullptr || lowerBound < *(node->p_LowestNodeinLeftSubTree->m_pLowerBound))
+			//Check to see if the current node has the lowest node in its left subtree
+			if(node->p_LowestNodeinLeftSubTree == nullptr || \
+				lowerBound < *(node->p_LowestNodeinLeftSubTree->m_pLowerBound))
 				listconcernedLowestNodesInLeftSubTree.push_back(&(node->p_LowestNodeinLeftSubTree));
 
-			node->p_left = insert(node->p_left, lowerBound, upperBound, value, concernedLowestNodeInRightSubTree, listconcernedLowestNodesInLeftSubTree);
+			node->p_left = insert(node->p_left, lowerBound, upperBound, value, \
+									concernedLowestNodeInRightSubTree, \
+									listconcernedLowestNodesInLeftSubTree);
 		}
 
 		else if(lowerBound > *node->m_pLowerBound )
 		{
 			//Check to see if the current node has the min node in its right subtree
-			if(node->p_LowestNodeInRightSubTree == nullptr || lowerBound < *(node->p_LowestNodeInRightSubTree->m_pLowerBound))
-				node->p_right = insert(node->p_right, lowerBound, upperBound, value, &(node->p_LowestNodeInRightSubTree), listconcernedLowestNodesInLeftSubTree);
+			if(node->p_LowestNodeInRightSubTree == nullptr || \
+				lowerBound < *(node->p_LowestNodeInRightSubTree->m_pLowerBound))
+				node->p_right = insert(node->p_right, lowerBound, upperBound, value, \
+										&(node->p_LowestNodeInRightSubTree), \
+										listconcernedLowestNodesInLeftSubTree);
 			else
-				node->p_right = insert(node->p_right, lowerBound, upperBound, value, concernedLowestNodeInRightSubTree, listconcernedLowestNodesInLeftSubTree);
+				node->p_right = insert(node->p_right, lowerBound, upperBound, value, \
+										concernedLowestNodeInRightSubTree, \
+										listconcernedLowestNodesInLeftSubTree);
 		}
 		else
 		{
@@ -188,7 +205,8 @@ private:
 		return node;
 	}
 
-	RangeNode<K,V>* deleteNode(RangeNode<K,V>* root, K& lowerBound, RangeNode<K,V>** concernedLowestNodeInRightSubTree, 
+	RangeNode<K,V>* deleteNode(RangeNode<K,V>* root, K& lowerBound, \
+								RangeNode<K,V>** concernedLowestNodeInRightSubTree, \
 								std::list<RangeNode<K,V>**>& listconcernedLowestNodesInLeftSubTree)
 	{
 		if(root == nullptr)
@@ -200,13 +218,15 @@ private:
 		{
 			//Resolving concerns by checking if the concern passed is in the left of this sub-tree and has a single child. 
 			//If yes, then the concerned LNIRS is the current node.
-			if(concernedLowestNodeInRightSubTree && *((*concernedLowestNodeInRightSubTree)->m_pLowerBound) == *(root->p_left->m_pLowerBound))
+			if(concernedLowestNodeInRightSubTree && \
+				*((*concernedLowestNodeInRightSubTree)->m_pLowerBound) == *(root->p_left->m_pLowerBound))
 			{
 				*concernedLowestNodeInRightSubTree = root;
 				concernedLowestNodeInRightSubTree = nullptr;
 			}
 
-			if(listconcernedLowestNodesInLeftSubTree.size() > 0 && *((*listconcernedLowestNodesInLeftSubTree.front())->m_pLowerBound) == *(root->p_left->m_pLowerBound))
+			if(listconcernedLowestNodesInLeftSubTree.size() > 0 && \
+				*((*listconcernedLowestNodesInLeftSubTree.front())->m_pLowerBound) == *(root->p_left->m_pLowerBound))
 			{
 				auto itr = listconcernedLowestNodesInLeftSubTree.begin();
 				while(itr != listconcernedLowestNodesInLeftSubTree.end())
@@ -217,24 +237,34 @@ private:
 				listconcernedLowestNodesInLeftSubTree.clear();
 			}
 
-			//Identifying concerns by checking if the node to be deleted is the curr nodes HNILS. If yes, then send its concern to resolve.
-			if(root ->p_LowestNodeinLeftSubTree && *(root ->p_LowestNodeinLeftSubTree->m_pLowerBound) == lowerBound)
+			//Identifying concerns by checking if the node to be deleted is the curr nodes LNILS. 
+			//If yes, then send its concern to resolve.
+			if(root ->p_LowestNodeinLeftSubTree && \
+				*(root ->p_LowestNodeinLeftSubTree->m_pLowerBound) == lowerBound)
 				listconcernedLowestNodesInLeftSubTree.push_back(&(root->p_LowestNodeinLeftSubTree));
 
-			root->p_left = deleteNode(root->p_left, lowerBound, concernedLowestNodeInRightSubTree, listconcernedLowestNodesInLeftSubTree);
+			root->p_left = deleteNode(root->p_left, lowerBound, \
+										concernedLowestNodeInRightSubTree, \
+										listconcernedLowestNodesInLeftSubTree);
 		}
 
 		// If the key to be deleted is greater than the root's key, 
 		// then it lies in right subtree 
 		else if (lowerBound > *(root->m_pLowerBound)) 
 		{
-			//Identifying concerns by checking if the node to be deleted is the curr nodes LNIRS. If yes, then send its concern to resolve.
-			if(root ->p_LowestNodeInRightSubTree && *(root ->p_LowestNodeInRightSubTree->m_pLowerBound) == lowerBound)
+			//Identifying concerns by checking if the node to be deleted is the curr nodes LNIRS. 
+			//If yes, then send its concern to resolve.
+			if(root ->p_LowestNodeInRightSubTree && \
+				*(root ->p_LowestNodeInRightSubTree->m_pLowerBound) == lowerBound)
 			{
-				root->p_right = deleteNode(root->p_right, lowerBound, &(root ->p_LowestNodeInRightSubTree), listconcernedLowestNodesInLeftSubTree);
+				root->p_right = deleteNode(root->p_right, lowerBound, \
+											&(root ->p_LowestNodeInRightSubTree), \
+											listconcernedLowestNodesInLeftSubTree);
 			}
 			else
-				root->p_right = deleteNode(root->p_right, lowerBound, concernedLowestNodeInRightSubTree, listconcernedLowestNodesInLeftSubTree);
+				root->p_right = deleteNode(root->p_right, lowerBound, \
+											concernedLowestNodeInRightSubTree, \
+											listconcernedLowestNodesInLeftSubTree);
 		}
 
 		// if key is same as root's key, then this is the node 
@@ -296,7 +326,7 @@ private:
 				return temp; 
 			} 
 
-			//If the node has come here, that means the node is not the LNIRS and HNIRS of any of the above nodes.
+			//If the node has come here, that means the node is not the LNIRS and LNILS of any of the above nodes.
 
 			// node with two children: Get the LNIRS
 			RangeNode<K,V>* temp = root->p_LowestNodeInRightSubTree;
@@ -307,7 +337,9 @@ private:
 			*root->m_pValue = *temp->m_pValue; 
 
 			// Delete the inorder successor. Also send the its LNIRS as a concern as it must be affected.
-			root->p_right = deleteNode(root->p_right, *temp->m_pLowerBound, &root->p_LowestNodeInRightSubTree, listconcernedLowestNodesInLeftSubTree); 
+			root->p_right = deleteNode(root->p_right, *temp->m_pLowerBound, \
+										&root->p_LowestNodeInRightSubTree, \
+										listconcernedLowestNodesInLeftSubTree); 
 		}
 		return root;
 	}
@@ -342,7 +374,8 @@ private:
 					searchAll(root->p_left, searchKey, searchResults);
 				
 				//Check if the search key is greater or equal to LNIRS. If yes, then go right.
-				if(root ->p_LowestNodeInRightSubTree && searchKey >= *(root ->p_LowestNodeInRightSubTree->m_pLowerBound))
+				if(root ->p_LowestNodeInRightSubTree && \
+					searchKey >= *(root ->p_LowestNodeInRightSubTree->m_pLowerBound))
 					searchAll(root->p_right, searchKey, searchResults);
 			}
 			else
@@ -357,6 +390,8 @@ private:
 
 	bool search(RangeNode<K,V>* root, const K& searchKey)
 	{
+		bool ret = false;
+
 		if(root == nullptr)
 			return false;
 
@@ -365,7 +400,7 @@ private:
 			if(root ->p_LowestNodeinLeftSubTree)
 			{
 				if(searchKey >= *(root->p_LowestNodeinLeftSubTree->m_pLowerBound))
-					return search(root->p_left, searchKey);
+					ret = search(root->p_left, searchKey);
 			}
 		}
 
@@ -374,26 +409,28 @@ private:
 			if(searchKey > *root->m_pLowerBound && searchKey < *root->m_pUpperBound)
 			{
 				//Filter matched
-				return true;
+				ret = true;
 			}
 			else
 			{
 				if(_bUniformRange)
 				{
 					if(searchKey - *root->m_pLowerBound  < *_pmaxrange)
-						return search(root->p_left, searchKey);
+						ret = search(root->p_left, searchKey);
 
-					if(root ->p_LowestNodeInRightSubTree && searchKey >= *(root ->p_LowestNodeInRightSubTree->m_pLowerBound))
-						return search(root->p_right, searchKey);
+					if(!ret && root ->p_LowestNodeInRightSubTree && \
+						searchKey >= *(root ->p_LowestNodeInRightSubTree->m_pLowerBound))
+						ret = search(root->p_right, searchKey);
 				}
 				else
 				{
-					return search(root->p_left, searchKey);
-					return search(root->p_right, searchKey);
+					ret = search(root->p_left, searchKey);
+					if(!ret)
+						ret = search(root->p_right, searchKey);
 				}
 			}
 		}
-		return false;
+		return ret;
 	}
 };
 

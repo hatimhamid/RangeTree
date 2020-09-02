@@ -150,8 +150,8 @@ void searchTestCases(RangeTree<u32, std::string>* rangeNode)
 	val_str = "riri";
 	
 	rangeNode->insert(50,55, val_str);
-	rangeNode->insert(5,15,val_str);
-	rangeNode->insert(5,15,val_str);
+	rangeNode->insert(5,32,val_str);
+	rangeNode->insert(5,70,val_str);
 	rangeNode->findAll(20, liststr);
 	bool isit = rangeNode->find(20);
 }
@@ -236,23 +236,23 @@ void DifferentClassTstcase()
 }
 int _tmain(int argc, _TCHAR* argv[])
 {
-	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	testMemoryLeak();
-	//RangeTree<u32, std::string>* rangeNode = new RangeTree<u32, std::string>(10);
+	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	//testMemoryLeak();
+	RangeTree<u32, std::string>* rangeNode = new RangeTree<u32, std::string>(10);
 	
-	/*addNodes1level(rangeNode);
+	addNodes1level(rangeNode);
     addNodes2Level(rangeNode);
 	addNodes3LevelTestCase(rangeNode);
 	
 	singleAddLeft(rangeNode);
 	singleAddRight(rangeNode);
 	deleteNodesTestCase(rangeNode);
-	searchTestCases(rangeNode);*/
+	searchTestCases(rangeNode);
 
 	//DifferentClassTstcase();
 	//std::cout<<"Hello World";
 	//rangeNode->clear();
-	_CrtDumpMemoryLeaks();
+	//_CrtDumpMemoryLeaks();
 	return 0;
 }
 
