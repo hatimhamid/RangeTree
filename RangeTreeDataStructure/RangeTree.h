@@ -11,17 +11,18 @@
 
 	Future Improvements Scope:
 	1. Iterator support
-	2. Support for Comparator
-	3. Reverse Range
+	2. Removing LowestNodeInRightSubTree
+	3. Handling same lowerBounds
+	4. Support for Comparator
+	5. Reverse Range
 */
 
 #pragma once
-#ifndef RANGE_NODE_H
-#define RANGE_NODE_H
+#ifndef RANGE_TREE_H
+#define RANGE_TREE_H
 
 #include "RangeNode.h"
 #include <list>
-#include <Windows.h>
 
 namespace rangetree
 {
@@ -362,7 +363,7 @@ private:
 
 		else
 		{
-			if(searchKey > *root->m_pLowerBound && searchKey < *root->m_pUpperBound)
+			if(searchKey > *root->m_pLowerBound && searchKey <= *root->m_pUpperBound)
 			{
 				//Filter matched
 				searchResults->push_back(*(root->m_pValue));
@@ -404,9 +405,9 @@ private:
 			}
 		}
 
-		else if(searchKey >= *root->m_pLowerBound)
+		else
 		{
-			if(searchKey > *root->m_pLowerBound && searchKey < *root->m_pUpperBound)
+			if(searchKey > *root->m_pLowerBound && searchKey <= *root->m_pUpperBound)
 			{
 				//Filter matched
 				ret = true;

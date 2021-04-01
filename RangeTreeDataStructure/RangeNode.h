@@ -7,8 +7,8 @@
 */
 
 #pragma once
-#ifndef RANGE_TREE_H
-#define RANGE_TREE_H
+#ifndef RANGE_NODE_H
+#define RANGE_NODE_H
 
 namespace rangetree
 {
